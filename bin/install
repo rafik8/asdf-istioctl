@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+#
+# Copyright (C) 2019 Innnovsquare
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License
+
+set -e
+set -o pipefail
+
+ASDF_INSTALL_TYPE=${ASDF_INSTALL_TYPE:-version  }
+TMPDIR=${TMPDIR:-/tmp}
+[ -n "$ASDF_INSTALL_VERSION" ] || (>&2 echo 'Missing ASDF_INSTALL_VERSION' && exit 1)
+[ -n "$ASDF_INSTALL_PATH" ] || (>&2 echo 'Missing ASDF_INSTALL_PATH' && exit 1)
+
+install_istioctl() {
+  local install_type=$1
+  local version=$2
+  local install_path=$3
+  local bin_install_path="$install_path/bin"
+  local download_url="$(get_download_url $version)"
+
+  mkdir -p "${bin_install_path}"
+
+  local bin_path="${bin_install_path}/istioctl"
+  echo "Downloading istioctl from ${download_url}"
+  echo "bin_install_path: ${bin_install_path}"
+  cd $TMPDIR
+  curl -L "$download_url" | tar xz
+  mv $PWD/istio-$version/bin/istioctl ${bin_install_path}
+  chmod +x ${bin_install_path}
+  rm -rf $PWD/istio-$version
+}
+
+get_arch() {
+  uname="$(uname -s)"
+  case "${uname}" in
+      Linux*)     machine=linux;;
+      Darwin*)    machine=osx;;
+      *)          machine="UNKNOWN:${uname}"
+  esac
+  echo ${machine}
+}
+
+get_download_url() {
+  local version="$1"
+  local os_dist="$(get_arch)"
+  echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}.tar.gz"
+}
+
+install_istioctl $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
