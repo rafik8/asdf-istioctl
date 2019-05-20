@@ -1,4 +1,4 @@
-# asdf-kubectl
+# asdf-istioctl
 
 [![Build Status](https://travis-ci.org/rafik8/asdf-istioctl.svg?branch=master)](https://travis-ci.org/rafik8/asdf-istioctl)
 

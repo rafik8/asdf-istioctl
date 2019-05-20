@@ -1,5 +1,5 @@
 language: c
-script: asdf plugin-test kubectl https://github.com/rafik8/asdf-istioctl.git
+script: asdf plugin-test istioctl https://github.com/rafik8/asdf-istioctl.git
 before_script:
   - git clone https://github.com/asdf-vm/asdf.git
   - . asdf/asdf.sh
