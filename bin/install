@@ -41,7 +41,7 @@ install_istioctl() {
   rm -rf $PWD/istio-$version
 }
 
-get_arch() {
+get_platform() {
   uname="$(uname -s)"
   case "${uname}" in
       Linux*)     machine=linux;;
@@ -51,10 +51,23 @@ get_arch() {
   echo ${machine}
 }
 
+verlte() {
+  [ "$1" = "$(echo -e "$1\n$2" | sort -V | head -n1)" ]
+}
+
+verlt() {
+  [ "$1" = "$2" ] && return 1 || verlte "$1" "$2"
+}
+
+get_arch() {
+  verlt "$1" 1.6.0 && echo "" || echo "-amd64"
+}
+
 get_download_url() {
   local version="$1"
-  local os_dist="$(get_arch)"
-  echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}.tar.gz"
+  local os_dist="$(get_platform)"
+  local arch="$(get_arch $version)"
+  echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}${arch}.tar.gz"
 }
 
 install_istioctl $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
