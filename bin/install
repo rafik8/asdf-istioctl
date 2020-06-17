@@ -53,8 +53,16 @@ get_arch() {
 
 get_download_url() {
   local version="$1"
+  local semver=( ${version//./ } )
+  local major="${semver[0]}"
+  local minor="${semver[1]}"
+
   local os_dist="$(get_arch)"
-  echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}.tar.gz"
+  if [ "$major" -ge 1 ] && [ "$minor" -ge 6 ] && [ "$os_dist" = linux ]; then
+      echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}-amd64.tar.gz"
+  else
+      echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}.tar.gz"
+  fi
 }
 
 install_istioctl $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
