@@ -41,19 +41,65 @@ install_istioctl() {
   rm -rf $PWD/istio-$version
 }
 
-get_arch() {
+get_os() {
   uname="$(uname -s)"
   case "${uname}" in
       Linux*)     machine=linux;;
       Darwin*)    machine=osx;;
       *)          machine="UNKNOWN:${uname}"
   esac
+
   echo ${machine}
+}
+
+get_arch() {
+  local local_arch=$(uname -m)
+  local istio_arch=""
+
+  case "${local_arch}" in
+    x86_64)
+      istio_arch=amd64
+      ;;
+    armv8*)
+      istio_arch=arm64
+      ;;
+    aarch64*)
+      istio_arch=arm64
+      ;;
+    armv*)
+      istio_arch=armv7
+      ;;
+    amd64|arm64)
+      istio_arch=${local_arch}
+      ;;
+    *)
+      echo "This system's architecture, ${local_arch}, isn't supported"
+      exit 1
+      ;;
+  esac
+
+  echo ${istio_arch}
+}
+
+is_new_download_link() {
+  local version="$1"
+  local major="${version:0:1}"
+  local minor="${version:2:1}"
+  if [ "${major}" -ge 2 -o "${minor}" -ge 6 ]; then
+    echo 0
+  else
+    echo 1
+  fi
 }
 
 get_download_url() {
   local version="$1"
-  local os_dist="$(get_arch)"
+  local os_dist="$(get_os)"
+  local is_new="$(is_new_download_link $version)"
+
+  if [ "${os_dist}" = "linux" -a "${is_new}" -eq 0 ]; then
+    os_dist="${os_dist}-$(get_arch)"
+  fi
   echo "https://github.com/istio/istio/releases/download/${version}/istio-${version}-${os_dist}.tar.gz"
 }
 
