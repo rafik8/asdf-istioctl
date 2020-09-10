@@ -60,7 +60,12 @@ verlt() {
 }
 
 get_arch() {
-  verlt "$1" 1.6.0 && echo "" || echo "-amd64"
+  os_dist=$(get_platform)
+  if verlt "$1" 1.6.0 || [ "$os_dist" = "osx" ]; then
+    echo ""
+  else
+    echo "-amd64"
+  fi
 }
 
 get_download_url() {
