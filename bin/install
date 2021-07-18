@@ -105,4 +105,3 @@ get_download_url() {
 }
 
 install_istioctl $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
-
