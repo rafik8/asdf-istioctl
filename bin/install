@@ -82,10 +82,11 @@ get_arch() {
 }
 
 is_new_download_link() {
-  local version="$1"
-  local major="${version:0:1}"
-  local minor="${version:2:1}"
-  if [ "${major}" -ge 2 -o "${minor}" -ge 6 ]; then
+  local version
+  IFS='.' read -r -a version <<< "$1"
+  local major="${version[0]}"
+  local minor="${version[1]}"
+  if [ "${major}" -ge 1 -a "${minor}" -ge 6 ]; then
     echo 0
   else
     echo 1
@@ -104,3 +105,4 @@ get_download_url() {
 }
 
 install_istioctl $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
+
