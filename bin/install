@@ -86,7 +86,7 @@ is_new_download_link() {
   IFS='.' read -r -a version <<< "$1"
   local major="${version[0]}"
   local minor="${version[1]}"
-  if [ "${major}" -ge 1 -a "${minor}" -ge 6 ]; then
+  if [ "${major}" -eq 1 -a "${minor}" -ge 6 ] || [ "${major}" -ge 2 ]; then
     echo 0
   else
     echo 1
